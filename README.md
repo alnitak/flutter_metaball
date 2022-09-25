@@ -1,4 +1,4 @@
-## flutter_metaballs
+## Metaballs in Flutter
 
 Metaballs are organic-looking n-dimensional isosurfaces, characterised 
 by their ability to meld together when in close proximity to create single, 
