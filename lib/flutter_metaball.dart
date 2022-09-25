@@ -13,7 +13,10 @@ class MetaballParams {
   /// The strenght defines also the radius
   final double radius;
 
-  MetaballParams(this.mCenter, this.radius);
+  /// add mass if true, else act as a black-hole
+  final bool addMass;
+
+  MetaballParams(this.mCenter, this.radius, {this.addMass = true});
 }
 
 class Metaball extends StatelessWidget {
@@ -69,10 +72,19 @@ class MetaballPainter extends CustomPainter {
       for (int x = 0; x < size.width; x += voxel, ++rows) {
         f = 0;
         for (int n = 0; n < balls.length; ++n) {
-          f += balls[n].radius /
-              (Offset(balls[n].center.dx - x, balls[n].center.dy - y).distance +
-                  0.00001);
-          if (matrix[cols][rows] < f) matrix[cols][rows] = f;
+          if (balls[n].addMass) {
+            f += balls[n].radius /
+                (Offset(balls[n].center.dx - x, balls[n].center.dy - y)
+                        .distance +
+                    0.00001);
+            if (matrix[cols][rows] < f) matrix[cols][rows] = f;
+          } else {
+            f -= balls[n].radius /
+                (Offset(balls[n].center.dx - x, balls[n].center.dy - y)
+                    .distance +
+                    0.00001);
+            if (matrix[cols][rows] > f) matrix[cols][rows] = f;
+          }
         }
 
         if (matrix[cols][rows] > 1.0) {

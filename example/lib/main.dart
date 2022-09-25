@@ -38,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   double width = 400;
   double height = 400;
   bool attraction = false;
+  bool addMass = true;
 
   List<MetaballParams> metaballs = [];
 
@@ -120,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               // remove it when released
               onPointerDown: (e) {
                 metaballs.add(
-                  MetaballParams(e.localPosition, 15),
+                  MetaballParams(e.localPosition, 15, addMass: addMass),
                 );
               },
               onPointerUp: (e) => metaballs.removeLast(),
@@ -147,14 +148,29 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(height: 30),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          /// CheckBoxes
+          Column(
             children: [
-              Checkbox(
-                value: attraction,
-                onChanged: (_) => attraction = !attraction,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: attraction,
+                    onChanged: (_) => attraction = !attraction,
+                  ),
+                  const Text('pointer attraction'),
+                ],
               ),
-              const Text('pointer attraction'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: addMass,
+                    onChanged: (_) => addMass = !addMass,
+                  ),
+                  const Text('pointer add/substract mass'),
+                ],
+              ),
             ],
           ),
         ],
