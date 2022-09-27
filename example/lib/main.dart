@@ -27,8 +27,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  AnimationController? controller;
+class _MyHomePageState extends State<MyHomePage> {
   int voxelSize = 2;
   int nMetaball = 5;
   double minRadius = 20;
@@ -57,14 +56,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           Random().nextDouble() * (maxRadius - minRadius) + minRadius,
           color: Colors.accents[Random().nextInt(Colors.accents.length)]),
     );
-    // metaballs = List.generate(
-    //   nMetaball,
-    //   (index) => MetaballParams(
-    //       Offset(100, 100 + index*100),
-    //       25,
-    //       color: index==0 ? Colors.red :
-    //       (index==1 ? Colors.yellowAccent : Colors.blue))
-    // );
 
     // set random spin
     spins = List.generate(
@@ -76,30 +67,36 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   (Random().nextInt(2) * 2 - 1), // <- random sign
             ));
 
-    controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1))
-          ..addListener(() {
-            // check if the metaballs are going out of view
-            for (int n = 0; n < nMetaball; ++n) {
-              double dx = metaballs[n].center.dx + spins[n].dx;
-              double dy = metaballs[n].center.dy + spins[n].dy;
-              if (dx > width || dx <= 0) {
-                spins[n] = Offset(spins[n].dx * -1, spins[n].dy);
-              }
-              if (dy > height || dy <= 0) {
-                spins[n] = Offset(spins[n].dx, spins[n].dy * -1);
-              }
 
-              metaballs[n].center += spins[n];
-            }
-            if (mounted) setState(() {});
-          });
-    controller?.repeat();
+
+    WidgetsBinding.instance.addPostFrameCallback(_postFrameCallback);
+  }
+
+  _postFrameCallback(Duration timeStamp) {
+    // check if the metaballs are going out of view
+    for (int n = 0; n < nMetaball; ++n) {
+      double dx = metaballs[n].center.dx + spins[n].dx;
+      double dy = metaballs[n].center.dy + spins[n].dy;
+      if (dx > width || dx <= 0) {
+        spins[n] = Offset(spins[n].dx * -1, spins[n].dy);
+      }
+      if (dy > height || dy <= 0) {
+        spins[n] = Offset(spins[n].dx, spins[n].dy * -1);
+      }
+
+      metaballs[n].center += spins[n];
+    }
+
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        setState(() {});
+        WidgetsBinding.instance.addPostFrameCallback(_postFrameCallback);
+      }
+    });
   }
 
   @override
   void dispose() {
-    controller?.dispose();
     super.dispose();
   }
 
@@ -150,6 +147,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     );
                   }
                 }
+                if (mounted) setState(() {});
               },
               child: Metaball(
                 balls: metaballs,
