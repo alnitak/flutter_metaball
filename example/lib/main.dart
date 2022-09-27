@@ -33,8 +33,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   int nMetaball = 5;
   double minRadius = 20;
   double maxRadius = 30;
-  double minSpin = 1;
-  double maxSpin = 3;
+  double minSpin = 2;
+  double maxSpin = 4;
   double width = 400;
   double height = 400;
   bool attraction = false;
@@ -53,10 +53,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     metaballs = List.generate(
       nMetaball,
       (index) => MetaballParams(
-        Offset(Random().nextDouble() * width, Random().nextDouble() * height),
-        Random().nextDouble() * (maxRadius - minRadius) + minRadius,
-      ),
+          Offset(Random().nextDouble() * width, Random().nextDouble() * height),
+          Random().nextDouble() * (maxRadius - minRadius) + minRadius,
+          color: Colors.accents[Random().nextInt(Colors.accents.length)]),
     );
+    // metaballs = List.generate(
+    //   nMetaball,
+    //   (index) => MetaballParams(
+    //       Offset(100, 100 + index*100),
+    //       25,
+    //       color: index==0 ? Colors.red :
+    //       (index==1 ? Colors.yellowAccent : Colors.blue))
+    // );
 
     // set random spin
     spins = List.generate(
@@ -71,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 1))
           ..addListener(() {
-            // check if the metaball is going out of view
+            // check if the metaballs are going out of view
             for (int n = 0; n < nMetaball; ++n) {
               double dx = metaballs[n].center.dx + spins[n].dx;
               double dy = metaballs[n].center.dy + spins[n].dy;
@@ -121,7 +129,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               // remove it when released
               onPointerDown: (e) {
                 metaballs.add(
-                  MetaballParams(e.localPosition, 15, addMass: addMass),
+                  MetaballParams(e.localPosition, 20,
+                      isAddingMass: addMass,
+                      color: const Color.fromARGB(255, 0, 0, 0)),
                 );
               },
               onPointerUp: (e) => metaballs.removeLast(),
@@ -148,6 +158,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(height: 30),
+
           /// CheckBoxes
           Column(
             children: [
